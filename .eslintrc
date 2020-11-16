@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "react-app",
+    "airbnb",
+    "plugin:jsx-a11y/recommended",
+    "prettier",
+    "prettier/react",
+    "plugin:cypress/recommended"
+  ],
+  "plugins": ["jsx-a11y", "prettier"],
+  "overrides": [
+    {
+      "files": ["*.jsx"],
+      "rules": {
+        "no-shadow": 0,
+        "camel-case": 0,
+        "jsx-a11y/click-events-have-key-events": 0,
+        "jsx-a11y/no-static-element-interactions": 0,
+        "import/no-named-as-default": 0
+      }
+    }
+  ]
+}

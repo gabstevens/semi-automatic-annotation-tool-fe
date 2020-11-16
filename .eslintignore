@@ -1,0 +1,4 @@
+build/*
+src/serviceWorker.js
+cypress/*
+node_modules/*
