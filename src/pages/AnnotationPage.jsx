@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { LinearProgress } from "@material-ui/core";
@@ -10,8 +10,13 @@ import {
   preprocessedDataset,
   preprocessedDatasetLoading
 } from "../ducks/selectors";
-import { SingleAnnotator } from "../components/annotation";
+import { DoubleAnnotator, SingleAnnotator } from "../components/annotation";
 import { useNotifications } from "../notifications";
+
+const mod = (n, m) => {
+  const remain = n % m;
+  return Math.floor(remain >= 0 ? remain : remain + m);
+};
 
 const useEnhancer = () => {
   const { preprocessedDatasetId, id } = useParams();
@@ -25,39 +30,59 @@ const useEnhancer = () => {
     dispatch(getPreprocessedDataset({ id: preprocessedDatasetId }));
   }, [dispatch, preprocessedDatasetId]);
 
+  const [save, setSave] = useState(true);
+
   const dataset = useSelector(preprocessedDataset);
   const datasetLoading = useSelector(preprocessedDatasetLoading);
   const annotationIdList = datasetLoading ? [] : dataset.annotation_set.map(({ id }) => `${id}`);
   const classList = dataset.detector.class_list;
-
   return {
     classList,
     annotation: useSelector(annotation),
     annotationLoading: useSelector(annotationLoading),
     datasetLoading,
-    onAnnotationChange: async ({ next, image }) => {
-      const { error } = await dispatch(
-        updateAnnotation({
-          id,
-          annotation: {
-            rgb_boxes: image.regions.map(({ cls, h, w, x, y }) => [
-              x + w / 2,
-              y + h / 2,
-              w,
-              h,
-              classList.findIndex(tag => tag === cls)
-            ])
-          }
-        })
-      );
+    save,
+    onSaveToggle: () => {
+      setSave(!save);
+    },
+    onAnnotationChange: async ({
+      next,
+      thermalImage = { regions: [] },
+      rgbImage = { regions: [] }
+    }) => {
+      const { error } =
+        save || next === undefined
+          ? await dispatch(
+              updateAnnotation({
+                id,
+                annotation: {
+                  rgb_boxes: rgbImage.regions.map(({ cls, h, w, x, y }) => [
+                    x + w / 2,
+                    y + h / 2,
+                    w,
+                    h,
+                    1,
+                    1,
+                    classList.findIndex(tag => tag === cls)
+                  ]),
+                  thermal_boxes: thermalImage.regions.map(({ cls, h, w, x, y }) => [
+                    x + w / 2,
+                    y + h / 2,
+                    w,
+                    h,
+                    1,
+                    1,
+                    classList.findIndex(tag => tag === cls)
+                  ])
+                }
+              })
+            )
+          : { error: false };
       if (error) {
         ko("Annotation not saved!");
       } else {
-        ok("Annotation saved!");
-        const mod = (n, m) => {
-          const remain = n % m;
-          return Math.floor(remain >= 0 ? remain : remain + m);
-        };
+        if (save) ok("Annotation saved!");
+
         if (next !== undefined) {
           const newId =
             annotationIdList[
@@ -79,19 +104,34 @@ const AnnotatePage = () => {
     annotation,
     annotationLoading,
     datasetLoading,
+    save,
+    onSaveToggle,
     onAnnotationChange
   } = useEnhancer();
+
+  const annotator =
+    annotation.rgb_url === null || annotation.thermal_url === null ? (
+      <SingleAnnotator
+        type={annotation.rgb_url === null ? "thermal" : "rgb"}
+        classList={classList}
+        annotation={annotation}
+        onAnnotationChange={onAnnotationChange}
+        save={save}
+        onSaveToggle={onSaveToggle}
+      />
+    ) : (
+      <DoubleAnnotator
+        classList={classList}
+        annotation={annotation}
+        onAnnotationChange={onAnnotationChange}
+        save={save}
+        onSaveToggle={onSaveToggle}
+      />
+    );
+
   return (
     <BaseLayout fullWidth>
-      {annotationLoading || datasetLoading ? (
-        <LinearProgress />
-      ) : (
-        <SingleAnnotator
-          classList={classList}
-          annotation={annotation}
-          onAnnotationChange={onAnnotationChange}
-        />
-      )}
+      {annotationLoading || datasetLoading ? <LinearProgress /> : annotator}
     </BaseLayout>
   );
 };

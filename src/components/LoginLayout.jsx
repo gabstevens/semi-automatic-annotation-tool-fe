@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
+import { Container } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -40,12 +41,12 @@ const LoginLayout = ({ children }) => {
     <div className={classes.root}>
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>SAAT</Toolbar>
+        <Toolbar>Semi Automatic Annotation Tool</Toolbar>
       </AppBar>
-      <main className={classes.content}>
+      <Container maxWidth="xs" component="main" className={classes.content}>
         <div className={classes.drawerHeader} />
         {children}
-      </main>
+      </Container>
     </div>
   );
 };

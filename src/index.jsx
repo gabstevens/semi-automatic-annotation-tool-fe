@@ -7,7 +7,7 @@ const DOM_MOUNT_NODE = document.getElementById("root");
 const renderApp = htmlElement => render(<App />, htmlElement);
 
 if (process.env.NODE_ENV !== "production" && module.hot) {
-  module.hot.accept(["./i18n", "./App"], () => renderApp(DOM_MOUNT_NODE));
+  module.hot.accept(["./App"], () => renderApp(DOM_MOUNT_NODE));
 }
 
 renderApp(DOM_MOUNT_NODE);

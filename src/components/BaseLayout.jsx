@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { isEmpty } from "lodash";
 import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -13,16 +14,25 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Container
+  Container,
+  Menu,
+  MenuItem,
+  Typography,
+  Button
 } from "@material-ui/core";
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  Home as HomeIcon,
-  Storage as StorageIcon
+  PhotoLibrary as PhotoLibraryIcon,
+  AddToPhotos as AddToPhotosIcon,
+  ExitToApp as ExitToAppIcon,
+  AccountCircle as AccountCircleIcon
 } from "@material-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserMe } from "../ducks/actions";
+import { userMe } from "../ducks/selectors";
 
 const drawerWidth = 240;
 
@@ -47,6 +57,9 @@ const useStyles = makeStyles(theme => ({
   },
   menuButton: {
     marginRight: 36
+  },
+  userMenuButton: {
+    textTransform: "none"
   },
   title: {
     flexGrow: 1
@@ -88,13 +101,23 @@ const useStyles = makeStyles(theme => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3)
+  },
+  fullWidthContent: {
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    height: "100vh"
   }
 }));
 
 const BaseLayout = ({ children, fullWidth }) => {
   const classes = useStyles();
   const theme = useTheme();
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(getUserMe());
+  }, [dispatch]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -104,6 +127,17 @@ const BaseLayout = ({ children, fullWidth }) => {
     setOpen(false);
   };
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const onMenuOpen = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const onMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const user = useSelector(userMe);
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -124,7 +158,20 @@ const BaseLayout = ({ children, fullWidth }) => {
           >
             <MenuIcon />
           </IconButton>
-          <div className={classes.title}>SAAT</div>
+          <Typography variant="h6" className={classes.title}>
+            Semi Automatic Annotation Tool
+          </Typography>
+          <Button onClick={onMenuOpen} color="inherit" className={classes.userMenuButton}>
+            <Typography variant="body2">{isEmpty(user) ? "" : user.username}</Typography>
+            &nbsp;
+            <AccountCircleIcon />
+          </Button>
+          <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={onMenuClose}>
+            <MenuItem component={RouterLink} to="/logout">
+              <ExitToAppIcon />
+              &nbsp;Logout
+            </MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -147,22 +194,29 @@ const BaseLayout = ({ children, fullWidth }) => {
         </div>
         <Divider />
         <List component="nav" dense>
-          <ListItem button component={RouterLink} to="/">
+          <ListItem button component={RouterLink} to="/preprocessed-datasets/new">
             <ListItemIcon>
-              <HomeIcon />
+              <AddToPhotosIcon />
             </ListItemIcon>
-            <ListItemText primary="Home" />
+            <ListItemText primary="Preprocess New Dataset" />
           </ListItem>
           <ListItem button component={RouterLink} to="/preprocessed-datasets">
             <ListItemIcon>
-              <StorageIcon />
+              <PhotoLibraryIcon />
             </ListItemIcon>
             <ListItemText primary="Preprocessed Datasets" />
+          </ListItem>
+          <Divider />
+          <ListItem button component={RouterLink} to="/logout">
+            <ListItemIcon>
+              <ExitToAppIcon />
+            </ListItemIcon>
+            <ListItemText primary="Logout" />
           </ListItem>
         </List>
       </Drawer>
       {fullWidth ? (
-        <main className={classes.content}>
+        <main className={classes.fullWidthContent}>
           <div className={classes.toolbar} />
           {children}
         </main>

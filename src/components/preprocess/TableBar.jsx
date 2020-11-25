@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, styled, Toolbar, Typography } from "@material-ui/core";
-import { Add as AddIcon } from "@material-ui/icons";
+import { AddToPhotos as AddToPhotosIcon } from "@material-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
 
 const Title = styled(Typography)({
@@ -17,7 +17,7 @@ const TableBar = () => {
         variant="contained"
         color="primary"
       >
-        <AddIcon />
+        <AddToPhotosIcon />
         &nbsp;Preprocess new dataset
       </Button>
     </Toolbar>

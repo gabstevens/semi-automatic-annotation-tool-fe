@@ -1,28 +1,29 @@
+import * as types from "./types";
+
 function onRequestSaga(request) {
-  return request;
-  // return {
-  //   headers: {
-  //     authorization: localStorage.getItem("SAAT_ACCESS_TOKEN"),
-  //     ...request.headers
-  //   },
-  //   ...request
-  // };
+  return {
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("SAAT_ACCESS_TOKEN")}`,
+      ...request.headers
+    },
+    ...request
+  };
 }
 
-function onSuccessSaga(response) {
+function onSuccessSaga(response, action) {
+  if (action.type === types.LOGIN) {
+    localStorage.setItem("SAAT_ACCESS_TOKEN", response.data.access);
+  }
   return response;
 }
 
 function onErrorSaga(error) {
   // eslint-disable-next-line no-console
   console.log("ERROR", error);
-  // if (
-  //   (error && error.response && [401, 403].includes(error.response.status)) ||
-  //   error.toString().match(/network error/i)
-  // ) {
-  //   localStorage.removeItem("SAAT_ACCESS_TOKEN");
-  //   window.location.href = "/";
-  // }
+  if (error && error.response && [401].includes(error.response.status)) {
+    localStorage.removeItem("SAAT_ACCESS_TOKEN");
+    window.location.href = "/";
+  }
 
   throw error;
 }

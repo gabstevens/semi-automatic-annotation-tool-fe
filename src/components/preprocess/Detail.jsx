@@ -41,7 +41,7 @@ const useEnhancer = () => {
   }, [dispatch, id]);
   useInterval(() => {
     dispatch(pollingPreprocessedDataset({ id }));
-  }, 3000);
+  }, 30000);
   return {
     id,
     preprocessedDataset: useSelector(preprocessedDataset),
@@ -66,7 +66,7 @@ const Detail = () => {
     FA: theme.palette.error.main,
     SU: theme.palette.success.main
   });
-  const [labelMap] = useState({ PE: "Pending", FA: "Failed", SU: "Succeded" });
+  const [labelMap] = useState({ PE: "Pending", FA: "Failed", SU: "Succeeded" });
   if (preprocessedDatasetLoading) return <LinearProgress />;
   return (
     <div>

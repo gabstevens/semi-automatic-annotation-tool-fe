@@ -1,12 +1,11 @@
 /* eslint-disable react/prop-types */
 import React from "react";
-import TrashIcon from "@material-ui/icons/Delete";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import { Typography, ButtonGroup, Select, Button, Paper } from "@material-ui/core";
 import { sentenceCase } from "sentence-case";
+import { ArrowBack, ArrowForward, Delete, FileCopy } from "@material-ui/icons";
 
-export const RegionLabel = ({ onCopy, isBoth }) => ({
+export const RegionLabel = ({ onCopy, type }) => ({
   region,
   editing,
   allowedClasses,
@@ -38,23 +37,31 @@ export const RegionLabel = ({ onCopy, isBoth }) => ({
               </ListItem>
             ))}
           </Select>
-          {isBoth ? (
-            <ButtonGroup size="small" style={{ marginTop: 4, width: "100%" }}>
-              <Button onClick={() => onCopy(region)} size="small" variant="outlined">
-                <ChevronRightIcon fontSize="small" />
+          {type !== "none" ? (
+            <ButtonGroup size="small" style={{ marginTop: 4, width: "100%" }} variant="outlined">
+              <Button onClick={() => onDelete(region)} size="small" style={{ flexGrow: 1 }}>
+                <Delete fontSize="small" />
               </Button>
-              <Button onClick={() => onDelete(region)} size="small" variant="outlined">
-                <TrashIcon fontSize="small" />
-              </Button>
+              {type === "left" ? (
+                <Button onClick={() => onCopy(region)} size="small" style={{ flexGrow: 1 }}>
+                  <FileCopy fontSize="small" />
+                  <ArrowForward fontSize="small" />
+                </Button>
+              ) : (
+                <Button onClick={() => onCopy(region)} size="small" style={{ flexGrow: 1 }}>
+                  <ArrowBack fontSize="small" />
+                  <FileCopy fontSize="small" />
+                </Button>
+              )}
             </ButtonGroup>
           ) : (
             <Button
               onClick={() => onDelete(region)}
               size="small"
-              variant="outlined"
+              variant="contained"
               style={{ marginTop: 4, width: "100%" }}
             >
-              <TrashIcon fontSize="small" />
+              <Delete fontSize="small" />
             </Button>
           )}
         </div>

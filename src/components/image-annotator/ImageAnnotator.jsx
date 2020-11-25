@@ -59,13 +59,13 @@ const useEnhancer = ({ image, classList, callback }) => {
   };
 };
 
-const ImageAnnotator = ({ image, classList, callback, onCopy, isBoth }) => {
+const ImageAnnotator = ({ image, classList, callback, onCopy, type }) => {
   const { state, dispatchToReducer } = useEnhancer({ image, classList, callback });
   return (
     <Annotator
       state={state}
       dispatchToReducer={dispatchToReducer}
-      RegionEditLabel={RegionEditLabel({ onCopy, isBoth })}
+      RegionEditLabel={RegionEditLabel({ onCopy, type })}
     />
   );
 };
@@ -75,7 +75,7 @@ ImageAnnotator.propTypes = {
   classList: PropTypes.arrayOf(PropTypes.string).isRequired,
   onCopy: PropTypes.func,
   callback: PropTypes.func,
-  isBoth: PropTypes.bool
+  type: PropTypes.string
 };
 
 ImageAnnotator.defaultProps = {
@@ -83,7 +83,7 @@ ImageAnnotator.defaultProps = {
   onCopy: console.log,
   // eslint-disable-next-line no-console
   callback: console.log,
-  isBoth: false
+  type: "none"
 };
 
 export default ImageAnnotator;

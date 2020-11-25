@@ -3,19 +3,16 @@ import React from "react";
 import numeral from "numeral";
 import * as yup from "yup";
 import { Provider as ReduxProvider } from "react-redux";
-import { IntlProvider } from "react-intl";
 import { ThemeProvider, createMuiTheme } from "@material-ui/core";
 import { SnackbarProvider } from "notistack";
 import { HashRouter, Switch, Redirect, Route } from "react-router-dom";
 import { configureStore } from "./ducks";
-import { translations } from "./i18n";
 import { DismissButton, Notifier } from "./notifications";
 import {
-  WelcomePage,
   LogoutPage,
-  HomePage,
+  LoginPage,
   AnnotationPage,
-  DoubleAnnotationPage,
+  // DoubleAnnotationPage,
   PreprocessedDatasetsPage,
   PreprocessedDatasetPage,
   NewPreprocessedDatasetPage
@@ -41,8 +38,6 @@ yup.setLocale({
 
 const theme = createMuiTheme(overriddenTheme);
 
-const language = "it";
-
 const notistackRef = React.createRef();
 const onClickDismiss = key => () => {
   notistackRef.current.closeSnackbar(key);
@@ -53,38 +48,38 @@ function App({ history }) {
   return (
     <ThemeProvider theme={theme}>
       <ReduxProvider store={store}>
-        <IntlProvider locale={language} key={language} messages={translations[language]}>
-          <SnackbarProvider
-            ref={notistackRef}
-            action={key => <DismissButton onClick={onClickDismiss(key)} />}
-          >
-            <HashRouter history={history}>
-              <Switch>
-                <PrivateRoute path="/home" component={HomePage} />
-                <Route path="/preprocessed-datasets" exact component={PreprocessedDatasetsPage} />
-                <Route
-                  path="/preprocessed-datasets/new"
-                  exect
-                  component={NewPreprocessedDatasetPage}
-                />
-                <Route
-                  path="/preprocessed-datasets/:id"
-                  exact
-                  component={PreprocessedDatasetPage}
-                />
-                <Route
-                  path="/preprocessed-datasets/:preprocessedDatasetId/annotations/:id"
-                  component={AnnotationPage}
-                />
-                <Route path="/double-annotation-page/:id" component={DoubleAnnotationPage} />
-                <Route exact path="/logout" component={LogoutPage} />
-                <Route exact path="/" component={WelcomePage} />
-                <Redirect to="/home" />
-              </Switch>
-              <Notifier />
-            </HashRouter>
-          </SnackbarProvider>
-        </IntlProvider>
+        <SnackbarProvider
+          ref={notistackRef}
+          action={key => <DismissButton onClick={onClickDismiss(key)} />}
+        >
+          <HashRouter history={history}>
+            <Switch>
+              <PrivateRoute
+                path="/preprocessed-datasets"
+                exact
+                component={PreprocessedDatasetsPage}
+              />
+              <PrivateRoute
+                path="/preprocessed-datasets/new"
+                component={NewPreprocessedDatasetPage}
+              />
+              <PrivateRoute
+                path="/preprocessed-datasets/:id"
+                exact
+                component={PreprocessedDatasetPage}
+              />
+              <PrivateRoute
+                path="/preprocessed-datasets/:preprocessedDatasetId/annotations/:id"
+                component={AnnotationPage}
+              />
+              {/* <PrivateRoute path="/double-annotation-page/:id" component={DoubleAnnotationPage} /> */}
+              <PrivateRoute exact path="/logout" component={LogoutPage} />
+              <Route exact path="/" component={LoginPage} />
+              <Redirect to="/" />
+            </Switch>
+            <Notifier />
+          </HashRouter>
+        </SnackbarProvider>
       </ReduxProvider>
     </ThemeProvider>
   );
